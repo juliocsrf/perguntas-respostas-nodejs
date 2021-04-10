@@ -1,5 +1,15 @@
 const express = require('express');
 const app = express();
+const connection = require('./database/database'); // Importando conexão com o banco
+
+connection
+	.authenticate()
+	.then(()=>{
+		console.log('Conexão realizada com sucesso');
+	})
+	.catch((error)=>{
+		console.log(error);
+	});
 
 app.set('view engine', 'ejs'); // Definindo o motor de HTML como EJS
 app.use(express.static('public')); // Definindo pastas de arquivos estatícos
