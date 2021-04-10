@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const connection = require('./database/database'); // Importando conexão com o banco
+const perguntaModel = require('./database/Pergunta'); // Importando meu Model
 
 connection
 	.authenticate()
@@ -9,7 +10,7 @@ connection
 	})
 	.catch((error)=>{
 		console.log(error);
-	});
+	}); // Realizando conexão com o banco
 
 app.set('view engine', 'ejs'); // Definindo o motor de HTML como EJS
 app.use(express.static('public')); // Definindo pastas de arquivos estatícos
