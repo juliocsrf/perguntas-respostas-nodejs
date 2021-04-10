@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const connection = require('./database/database'); // Importando conexão com o banco
-const perguntaModel = require('./database/Pergunta'); // Importando meu Model
+const Pergunta = require('./database/Pergunta'); // Importando meu Model
+const Resposta = require('./database/Resposta');
 
 connection
 	.authenticate()
@@ -18,7 +19,11 @@ app.use(express.urlencoded({extended: true})); // Ativando o body-parser
 app.use(express.json()); // Ativando leitura de dados em JSON
 
 app.get('/', (req, res) => {
-	res.render('index'); // Renderizando minha view
+	Pergunta.findAll({raw: true, order: [
+		['id', 'DESC'] // Realizando ordenação
+	]}).then((perguntas)=>{ // Incluir o raw = true para não trazer outras informações do banco e trazer somente os dados
+		res.render('index', {perguntas}); // Renderizando minha view
+	}) // Buscando todos os registros da tabela
 });
 
 app.get('/perguntar', (req, res) => {
@@ -29,7 +34,25 @@ app.post('/salvarpergunta', (req, res) => {
 	let title = req.body.titulo;
 	let description = req.body.descricao;
 
-	res.send(`Título: ${title} / Descrição: ${description}`);
+	Pergunta.create({
+		titulo: title,
+		descricao: description
+	}).then(()=>{
+		res.redirect('/'); // Salvando os dados na tabela e redirecionando o usuário
+	});
+});
+
+app.get('/pergunta/:id', (req, res) => {
+	let id = req.params.id;
+	Pergunta.findOne({
+		where: {id: id}
+	}).then(pergunta => {
+		if(pergunta != undefined) {
+			res.render('pergunta', {pergunta});
+		} else {
+			res.redirect('/');
+		}
+	})
 });
 
 app.listen(8080, () => {
